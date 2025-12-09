@@ -1,0 +1,45 @@
+import collections
+import re
+
+def task_1_skill_matcher():
+    """Implements the Basic Skill Matcher task."""
+    print("\n--- Task 1: Basic Skill Matcher ---")
+    resume_skills_input = input("Enter your resume skills (comma-separated): ")
+    job_skills_input = input("Enter job required skills (comma-separated): ")
+
+    # Convert inputs to sets for easy comparison
+    resume_skills = set(skill.strip().lower() for skill in resume_skills_input.split(','))
+    job_skills = set(skill.strip().lower() for skill in job_skills_input.split(','))
+
+    # Calculate matched and missing skills
+    matched_skills = resume_skills.intersection(job_skills)
+    missing_skills = job_skills.difference(resume_skills)
+
+    print(f"\nMatched Skills: {list(matched_skills)}")
+    print(f"Missing Skills: {list(missing_skills)}")
+
+def task_2_word_counter():
+    """Implements the Resume Word Counter task."""
+    print("\n--- Task 2: Resume Word Counter ---")
+    resume_text = input("Enter a paragraph of resume text: ")
+
+    # Clean text and count words
+    words = re.findall(r'\b\w+\b', resume_text.lower())
+    total_words = len(words)
+    unique_words = len(set(words))
+    
+    # Identify most repeated word
+    if words:
+        word_counts = collections.Counter(words)
+        most_repeated_word, count = word_counts.most_common(1)[0]
+    else:
+        most_repeated_word, count = "N/A", 0
+
+    print(f"\nTotal Words: {total_words}")
+    print(f"Unique Words: {unique_words}")
+    print(f"Most Repeated Word: '{most_repeated_word}' (Count: {count})")
+
+if _name_ == "_main_":
+    task_1_skill_matcher()
+    print("\n" + "="*40) # Separator for clarity
+    task_2_word_counter()
