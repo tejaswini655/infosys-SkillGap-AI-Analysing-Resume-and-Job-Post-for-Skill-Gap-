@@ -1,0 +1,8 @@
+# Code for Task 3
+sentence = input("Enter a sentence like 'I have X years of experience in Python.': ")
+years = ""
+for char in sentence:
+    if char.isdigit():
+        years += char
+# Assuming only one number in the sentence for simplicity
+print(f"Experience Detected: {years} Years")

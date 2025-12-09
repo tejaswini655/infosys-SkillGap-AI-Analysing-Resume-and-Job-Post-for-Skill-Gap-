@@ -1,0 +1,10 @@
+def extract_email(text):
+    words = text.split()
+    for word in words:
+        if "@" in word:
+            return word
+    return "No email detected."
+
+user_input = input("Input a text block: ")
+extracted_email = extract_email(user_input)
+print(f"Extracted email: {extracted_email}")

@@ -1,0 +1,17 @@
+def classify_resume(skills_list):
+    """Classifies a list of skills into a resume category."""
+    skills_lower = [skill.strip().lower() for skill in skills_list]
+
+    if any(skill in skills_lower for skill in ['data', 'ml', 'machine learning', 'ai', 'artificial intelligence']):
+        return "Data/ML"
+    elif any(skill in skills_lower for skill in ['web', 'html', 'css', 'javascript', 'frontend', 'backend', 'react', 'angular', 'vue']):
+        return "Web Development"
+    elif any(skill in skills_lower for skill in ['software', 'development', 'python', 'java', 'c++', 'engineering']):
+        return "Software Development"
+    else:
+        return "Other"
+
+user_input_skills = input("Enter a list of skills, separated by commas (e.g., Python, ML, HTML): ")
+skills = user_input_skills.split(',')
+predicted_category = classify_resume(skills)
+print(f"Predicted category: {predicted_category}")

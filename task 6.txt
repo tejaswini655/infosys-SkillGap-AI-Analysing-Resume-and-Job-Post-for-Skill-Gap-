@@ -1,0 +1,10 @@
+def count_skill_frequency(text, skill):
+    """Counts the frequency of a skill in a given text."""
+    # Count occurrences case-insensitively
+    return text.lower().count(skill.lower())
+
+user_input_text = input("Enter a paragraph of resume text: ")
+user_input_skill = input("Enter the skill to check frequency for: ")
+
+frequency = count_skill_frequency(user_input_text, user_input_skill)
+print(f"Skill appears {frequency} times.")

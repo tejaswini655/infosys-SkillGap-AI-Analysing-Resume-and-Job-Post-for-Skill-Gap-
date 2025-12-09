@@ -1,0 +1,33 @@
+def tech_stack_counter(tools_list):
+    categories = {
+        "Python": "Programming Languages",
+        "Java": "Programming Languages",
+        "C++": "Programming Languages",
+        "SQL": "Databases",
+        "MongoDB": "Databases",
+        "React": "Frameworks",
+        "Django": "Frameworks",
+        "Flask": "Frameworks"
+    }
+
+    counts = {
+        "Programming Languages": 0,
+        "Databases": 0,
+        "Frameworks": 0
+    }
+
+    for tool in tools_list:
+        tool = tool.strip()
+        if tool in categories:
+            category = categories[tool]
+            counts[category] += 1
+    
+    return counts
+
+user_input = input("Input a list of tools/technologies (comma-separated): ")
+tools = user_input.split(',')
+summary = tech_stack_counter(tools)
+
+print("\nSummary:")
+for category, count in summary.items():
+    print(f"- {category}: {count}")

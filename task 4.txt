@@ -1,0 +1,12 @@
+# Code for Task 4
+import re
+
+job_title = input("Enter a job title: ")
+
+# Remove special characters using regex, keeping only alphanumeric and spaces
+cleaned_title = re.sub(r'[^a-zA-Z0-9\s]', '', job_title)
+
+# Convert to title case
+normalized_title = cleaned_title.title()
+
+print(f"Normalized Job Title: {normalized_title}")
