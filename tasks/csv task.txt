@@ -1,0 +1,47 @@
+import csv
+
+students_data = [
+    {'name': 'Alice', 'age': 24, 'grade': 'A'},
+    {'name': 'Bob', 'age': 22, 'grade': 'B'},
+    {'name': 'Charlie', 'age': 25, 'grade': 'C'}
+]
+fieldnames = ['name', 'age', 'grade']
+filename = 'students.csv'
+
+with open(filename, mode='w', newline='') as file:
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(students_data)
+
+print(f"File '{filename}' created successfully.")
+
+
+output of first program:
+name,age,grade
+Alice,24,A
+Bob,22,B
+Charlie,25,C
+
+2.
+id,name,department
+1,John Doe,Sales
+2,Jane Smith,IT
+3,Peter Jones,HR
+import csv
+
+filename = 'employees.csv'
+
+try:
+    with open(filename, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            print(row)
+except FileNotFoundError:
+    print(f"Error: The file '{filename}' was not found.")
+
+output:
+
+['id', 'name', 'department']
+['1', 'John Doe', 'Sales']
+['2', 'Jane Smith', 'IT']
+['3', 'Peter Jones', 'HR']
