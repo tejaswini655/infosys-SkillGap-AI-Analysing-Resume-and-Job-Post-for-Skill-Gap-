@@ -7,4 +7,5 @@ def extract_email(text):
 
 user_input = input("Input a text block: ")
 extracted_email = extract_email(user_input)
+
 print(f"Extracted email: {extracted_email}")
