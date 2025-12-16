@@ -30,4 +30,5 @@ summary = tech_stack_counter(tools)
 
 print("\nSummary:")
 for category, count in summary.items():
+
     print(f"- {category}: {count}")
