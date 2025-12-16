@@ -1,0 +1,249 @@
+import csv
+
+file_name = 'students.csv'
+header = ['name', 'age', 'grade']
+data = [
+    ['Alice', 20, 'A'],
+    ['Bob', 21, 'B'],
+    ['Charlie', 19, 'C']
+]
+
+with open(file_name, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(header)
+    writer.writerows(data)
+
+print(f"File '{file_name}' created successfully with 3 records.")
+
+OUTPUT:
+name,age,grade
+Alice,20,A
+Bob,21,B
+Charlie,19,C
+
+2.
+id,name,department
+1,John Doe,Sales
+2,Jane Smith,IT
+import csv
+
+file_name = 'employees.csv'
+
+try:
+    with open(file_name, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            print(row)
+except FileNotFoundError:
+    print(f"Error: The file '{file_name}' was not found.")
+
+OUTPUT:
+['id', 'name', 'department']
+['1', 'John Doe', 'Sales']
+['2', 'Jane Smith', 'IT']
+
+3.
+product_name,price,stock
+Laptop,1200,50
+Mouse,25,200
+Keyboard,75,100
+import csv
+
+file_name = 'products.csv'
+
+try:
+    with open(file_name, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if row:
+                print(row[0])
+except FileNotFoundError:
+    print(f"Error: The file '{file_name}' was not found.")
+
+OUTPUT:
+
+product_name
+Laptop
+Mouse
+Keyboard
+
+4.
+import csv
+
+file_name = 'products.csv'
+
+try:
+    with open(file_name, mode='r', newline='') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            print(row)
+except FileNotFoundError:
+    print(f"Error: The file '{file_name}' was not found.")
+
+OUTPUT:
+{'product_name': 'Laptop', 'price': '1200', 'stock': '50'}
+{'product_name': 'Mouse', 'price': '25', 'stock': '200'}
+{'product_name': 'Keyboard', 'price': '75', 'stock': '100'}
+
+5.
+name,subject,marks
+David,Math,85
+Eve,Science,92
+import csv
+
+file_name = 'marks.csv'
+new_record = ['Frank', 'History', 78]
+
+with open(file_name, mode='a', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(new_record)
+
+print(f"New record added to '{file_name}'.")
+
+OUTPUT:
+name,subject,marks
+David,Math,85
+Eve,Science,92
+Frank,History,78
+
+6.
+id,value
+1,100
+2,200
+3,300
+4,400
+import csv
+
+file_name = 'data.csv'
+row_count = 0
+
+try:
+    with open(file_name, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        next(reader, None) # Skip the header row
+        for row in reader:
+            row_count += 1
+
+    print(f"Total number of rows (excluding header): {row_count}")
+except FileNotFoundError:
+    print(f"Error: The file '{file_name}' was not found.")
+
+OUTPUT:
+Total number of rows (excluding header): 4
+
+7.
+item,price,quantity
+Laptop,1200,5
+Mouse,25,10
+Keyboard,75,4
+import csv
+
+file_name = 'sales.csv'
+total_sales = 0
+
+try:
+    with open(file_name, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        next(reader, None) # Skip header
+        for row in reader:
+            if len(row) == 3:
+                try:
+                    price = float(row[1])
+                    quantity = int(row[2])
+                    total_sales += price * quantity
+                except ValueError:
+                    print(f"Skipping row due to invalid data: {row}")
+
+    print(f"Total sales: ${total_sales:.2f}")
+except FileNotFoundError:
+    print(f"Error: The file '{file_name}' was not found.")
+
+OUTPUT:
+Total sales: $6450.00
+
+8.import csv
+
+file_name = 'output.csv'
+data = [
+    ['id', 'name'],
+    [1, 'Alice'],
+    [2, 'Bob'],
+    [3, 'Charlie']
+]
+
+with open(file_name, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerows(data)
+
+print(f"List of lists converted to '{file_name}'.")
+
+OUTPUT:
+id,name
+1,Alice
+2,Bob
+3,Charlie
+
+9.
+name,age,city
+Alice,25,New York
+Bob,35,Los Angeles
+Charlie,40,Chicago
+David,22,Houston
+Eve,31,Miami
+import csv
+
+file_name = 'people.csv'
+
+try:
+    with open(file_name, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        header = next(reader, None)
+        if header:
+            print(header) # Print header
+            for row in reader:
+                if len(row) > 1:
+                    try:
+                        if int(row[1]) > 30:
+                            print(row)
+                    except ValueError:
+                        continue # Skip rows with non-integer age
+
+except FileNotFoundError:
+    print(f"Error: The file '{file_name}' was not found.")
+
+OUTPUT:
+['name', 'age', 'city']
+['Bob', '35', 'Los Angeles']
+['Charlie', '40', 'Chicago']
+['Eve', '31', 'Miami']
+
+10.
+col1,col2
+data1,data2
+data3,data4
+import csv
+
+source_file = 'source.csv'
+copy_file = 'copy.csv'
+
+try:
+    with open(source_file, mode='r', newline='') as src, \
+         open(copy_file, mode='w', newline='') as dst:
+        reader = csv.reader(src)
+        writer = csv.writer(dst)
+        for row in reader:
+            writer.writerow(row)
+
+    print(f"All contents copied from '{source_file}' to '{copy_file}'.")
+except FileNotFoundError:
+    print(f"Error: The source file '{source_file}' was not found.")
+
+OUTPUT:
+All contents copied from 'source.csv' to 'copy.csv'.
+
+
+
+
+
+
+
