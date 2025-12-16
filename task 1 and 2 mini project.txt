@@ -42,4 +42,5 @@ def task_2_word_counter():
 if _name_ == "_main_":
     task_1_skill_matcher()
     print("\n" + "="*40) # Separator for clarity
+
     task_2_word_counter()
