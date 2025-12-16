@@ -5,4 +5,5 @@ for char in sentence:
     if char.isdigit():
         years += char
 # Assuming only one number in the sentence for simplicity
+
 print(f"Experience Detected: {years} Years")
