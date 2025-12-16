@@ -1,0 +1,163 @@
+import PyPDF2
+import pdfplumber
+import re
+import os
+
+# Define the PDF file name
+PDF_FILE = "sample.pdf"
+TXT_FILE = "extracted_text.txt"
+
+def run_problem(problem_num, description, func):
+    """Helper function to run and display results for each problem."""
+    print(f"\n--- Problem {problem_num}: {description} ---")
+    try:
+        func()
+    except FileNotFoundError:
+        print(f"Error: {PDF_FILE} not found. Please ensure the file exists.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# 1. Extract all text from a PDF using PyPDF2.
+def problem_1():
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        full_text = ""
+        for page in reader.pages:
+            full_text += page.extract_text() or ""
+    print(f"Total extracted text length: {len(full_text)} characters.")
+    # print(full_text[:500] + "...") # Print first 500 chars
+
+# 2. Extract text only from Page 1 of your PDF.
+def problem_2():
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        if len(reader.pages) > 0:
+            page_one_text = reader.pages[0].extract_text() or ""
+            print(f"Page 1 text length: {len(page_one_text)} characters.")
+        else:
+            print("PDF has no pages.")
+
+# 3. Count the total number of pages in your PDF.
+def problem_3():
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        page_count = len(reader.pages)
+        print(f"Total number of pages: *{page_count}*")
+
+# 4. Detect whether your PDF is scanned (empty text extraction).
+def problem_4():
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        text_found = False
+        for page in reader.pages:
+            if page.extract_text():
+                text_found = True
+                break
+        if text_found:
+            print("Text found. PDF is likely not scanned (or has embedded text).")
+        else:
+            print("No text found. PDF is likely scanned.")
+
+# 5. Extract headings (lines in uppercase or bold-like text).
+def problem_5():
+    # This is a conceptual approach; exact implementation depends on PDF structure.
+    # We can approximate by looking for all-caps lines.
+    headings = []
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        for page in reader.pages:
+            text = page.extract_text() or ""
+            for line in text.split('\n'):
+                line = line.strip()
+                # Simple check for all uppercase, non-empty lines
+                if line.isupper() and len(line) > 5:
+                    headings.append(line)
+    print(f"Found {len(headings)} potential headings (all caps): {headings[:5]}...")
+
+# 6. Extract tables from your PDF using pdfplumber.
+def problem_6():
+    with pdfplumber.open(PDF_FILE) as pdf:
+        all_tables = []
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            all_tables.extend(tables)
+        print(f"Found {len(all_tables)} tables across all pages.")
+        if all_tables:
+            print(f"First table snippet: {all_tables[0][0][:5]}...")
+
+# 7. Extract metadata (Author, Title, Creation Date) from your PDF.
+def problem_7():
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        metadata = reader.metadata
+        if metadata:
+            print(f"Title: {metadata.title}")
+            print(f"Author: {metadata.author}")
+            print(f"Creation Date: {metadata.creation_date}")
+        else:
+            print("No metadata found.")
+
+# 8. Save extracted text from your PDF into a .txt file.
+def problem_8():
+    full_text = ""
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        for page in reader.pages:
+            full_text += page.extract_text() or ""
+    with open(TXT_FILE, 'w', encoding='utf-8') as output_file:
+        output_file.write(full_text)
+    print(f"Extracted text saved to *{TXT_FILE}*")
+
+# 9. Extract only email IDs from your PDF text using regex.
+def problem_9():
+    email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+    full_text = ""
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        for page in reader.pages:
+            full_text += page.extract_text() or ""
+    emails = re.findall(email_pattern, full_text)
+    print(f"Found {len(emails)} email addresses: {emails[:5]}...")
+
+# 10. Create a combined extractor logic.
+def problem_10():
+    text = ""
+    # Try PyPDF2
+    with open(PDF_FILE, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        for page in reader.pages:
+            text += page.extract_text() or ""
+    
+    if text.strip():
+        print("PyPDF2 extracted text successfully.")
+        # print(text[:100] + "...")
+        return
+
+    # If empty try pdfplumber (pdfplumber also uses PyPDF2 internally for text but handles layout differently)
+    # A better check here would be if PyPDF2 failed to get any text.
+    # For demonstration, we simulate the logic.
+    print("PyPDF2 extraction empty. Trying pdfplumber...")
+    with pdfplumber.open(PDF_FILE) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() or ""
+
+    if text.strip():
+        print("pdfplumber extracted text successfully.")
+        # print(text[:100] + "...")
+        return
+    
+    # If still empty print 'Scanned PDF detected'
+    print("*Scanned PDF detected* (no text extracted by either method).")
+
+
+# Run all problems
+run_problem(1, "Extract all text from a PDF using PyPDF2.", problem_1)
+run_problem(2, "Extract text only from Page 1 of your PDF.", problem_2)
+run_problem(3, "Count the total number of pages in your PDF.", problem_3)
+run_problem(4, "Detect whether your PDF is scanned (empty text extraction).", problem_4)
+run_problem(5, "Extract headings (lines in uppercase or bold-like text).", problem_5)
+run_problem(6, "Extract tables from your PDF using pdfplumber.", problem_6)
+run_problem(7, "Extract metadata (Author, Title, Creation Date) from your PDF.", problem_7)
+run_problem(8, "Save extracted text from your PDF into a .txt file.", problem_8)
+run_problem(9, "Extract only email IDs from your PDF text using regex.", problem_9)
+run_problem(10, "Create a combined extractor logic.", problem_10)
