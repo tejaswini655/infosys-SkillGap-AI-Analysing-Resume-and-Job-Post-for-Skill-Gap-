@@ -1,0 +1,125 @@
+import json
+
+json_string = '{"name": "Alex", "age": 22, "city": "Chennai"}'
+python_dict = json.loads(json_string)
+print(f"Python dictionary: {python_dict}")
+print(f"Type: {type(python_dict)}")
+
+OUTPUT:
+{'name': 'Alex', 'age': 22, 'city': 'Chennai'}
+
+2.
+import json
+
+python_dict = {'id': 101, 'product': 'Laptop', 'price': 55000}
+json_string = json.dumps(python_dict)
+print(f"JSON string: {json_string}")
+print(f"Type: {type(json_string)}")
+
+OUTPUT:
+"{\"id\": 101, \"product\": \"Laptop\", \"price\": 55000}"
+
+3.
+import json
+
+data = {'key1': 'value1', 'key2': 'value2'}
+with open('data.json', 'w') as f:
+    json.dump(data, f)
+with open('data.json', 'r') as f:
+    data = json.load(f)
+    for key, value in data.items():
+        print(f"{key}: {value}")
+
+OUTPUT:
+key1: value1
+key2: value2
+
+4.
+import json
+
+student_dict = {'name': 'Mia', 'age': 24, 'grade': 'A'}
+with open('student.json', 'w') as f:
+    json.dump(student_dict, f, indent=4)
+print("Dictionary written to student.json")
+
+OUTPUT:
+student.json
+
+5.
+import json
+
+json_string = '{"employee": {"name": "John", "age": 30, "department": "HR"}}'
+data = json.loads(json_string)
+department = data['employee']['department']
+print(f"Department: {department}")
+
+OUTPUT:
+Department: HR
+
+6.
+import json
+
+data = {'name': 'Raj', 'age': 45}
+data['age'] = 50
+json_string = json.dumps(data)
+print(f"Updated JSON string: {json_string}")
+
+OUTPUT:
+"{\"name\": \"Raj\", \"age\": 50}"
+
+7.
+import json
+
+json_list_string = '["red", "green", "blue"]'
+data_list = json.loads(json_list_string)
+second_item = data_list[1]
+print(f"Second item: {second_item}")
+
+OUTPUT:
+Second item: green
+
+8.
+import json
+
+json_string = '{"users": [{"id": 1, "name": "Alex"}, {"id": 2, "name": "Mia"}]}'
+data = json.loads(json_string)
+user_list = data['users']
+for user in user_list:
+    print(f"User name: {user['name']}")
+
+OUTPUT:
+User name: Alex
+User name: Mia
+
+9.
+import json
+
+data = {'name': 'Sam', 'age': 28}
+data['country'] = 'India'
+json_string = json.dumps(data)
+print(f"Updated JSON string: {json_string}")
+
+OUTPUT:
+"{\"name\": \"Sam\", \"age\": 28, \"country\": \"India\"}"
+
+10.
+import json
+
+items_data = [{'item': 'Pen', 'price': 10}, {'item': 'Book', 'price': 50}, {'item': 'Bag', 'price': 700}]
+with open('items.json', 'w') as f:
+    json.dump(items_data, f)
+total_cost = 0
+with open('items.json', 'r') as f:
+    items = json.load(f)
+    for item in items:
+        total_cost += item['price']
+print(f"Total cost: {total_cost}")
+
+OUTPUT:
+Total cost: 760
+
+
+
+
+
+
