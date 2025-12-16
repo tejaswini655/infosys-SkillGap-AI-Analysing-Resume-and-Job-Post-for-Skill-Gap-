@@ -1,0 +1,82 @@
+import pdfplumber
+import pandas as pd
+import csv
+
+pdf_path = "your_pdf_file.pdf"
+
+# Function to run all questions
+def run_all_questions(path):
+    with pdfplumber.open(path) as pdf:
+        print("--- 1. Extract all text from the first page ---")
+        first_page_text = pdf.pages[0].extract_text()
+        print(f"Text from page 1 (excerpt):\n{first_page_text[:200]}...")
+        print("-" * 20)
+
+        print("--- 2. Extract text from all pages ---")
+        all_text = ""
+        for page in pdf.pages:
+            all_text += page.extract_text() + "\n"
+        print(f"Text from all pages (excerpt):\n{all_text[:200]}...")
+        print("-" * 20)
+
+        print("--- 3. Count the total number of pages ---")
+        page_count = len(pdf.pages)
+        print(f"Total number of pages: {page_count}")
+        print("-" * 20)
+
+        print("--- 4. Detect whether your PDF is scanned (no extractable text) ---")
+        is_scanned = all(page.extract_text() is None or page.extract_text().strip() == "" for page in pdf.pages)
+        print(f"Is the PDF likely scanned? {'Yes' if is_scanned else 'No'}")
+        print("-" * 20)
+
+        print("--- 5. Extract the first table on page 1 ---")
+        # Note: extract_tables() returns a list of tables. Configuration might be needed for complex tables.
+        tables = pdf.pages[0].extract_tables()
+        if tables:
+            print(f"First table on page 1:\n{tables[0][:5]}...") # print first 5 rows for brevity
+        else:
+            print("No tables found on page 1.")
+        print("-" * 20)
+
+        print("--- 6. Extract all tables from the entire PDF ---")
+        all_tables = []
+        for page in pdf.pages:
+            all_tables.extend(page.extract_tables())
+        print(f"Total number of tables found: {len(all_tables)}")
+        if all_tables:
+            print(f"First table of all tables (excerpt):\n{all_tables[0][:5]}...")
+        print("-" * 20)
+
+        print("--- 7. Extract all words along with their bounding-box coordinates ---")
+        # Words is a list of dictionaries, each with 'text', 'x0', 'y0', 'x1', 'y1' etc.
+        words_with_coords = pdf.pages[0].extract_words()
+        print(f"First 5 words with coordinates from page 1:\n{words_with_coords[:5]}")
+        print("-" * 20)
+
+        print("--- 8. Extract all embedded images from a page ---")
+        # This extracts image objects, not the image data itself.
+        images = pdf.pages[0].images
+        print(f"Number of images on page 1: {len(images)}")
+        print(f"First image data (if any): {images[0] if images else 'N/A'}")
+        print("-" * 20)
+
+        print("--- 9. Extract all lines and shapes (vector objects) from the PDF ---")
+        # Lines and shapes are dictionaries with coordinates and properties
+        shapes = pdf.pages[0].shapes
+        print(f"Number of shapes on page 1: {len(shapes)}")
+        print(f"First shape data (if any): {shapes[0] if shapes else 'N/A'}")
+        print("-" * 20)
+
+        print("--- 10. Extract a table from the PDF and save it as a CSV file ---")
+        if tables:
+            df = pd.DataFrame(tables[0][1:], columns=tables[0][0])
+            csv_filename = "extracted_table.csv"
+            df.to_csv(csv_filename, index=False)
+            print(f"Table successfully saved to {csv_filename}")
+        else:
+            print("Cannot save table as no table was found in Q5.")
+        print("-" * 20)
+
+# Run the script
+if _name_ == "_main_":
+    run_all_questions(pdf_path)
