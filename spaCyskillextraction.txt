@@ -1,0 +1,149 @@
+# 1. Install and load spaCy model
+# Run these once if not installed
+# !pip install spacy
+# !python -m spacy download en_core_web_sm
+
+import spacy
+from spacy.matcher import PhraseMatcher
+import json
+
+nlp = spacy.load("en_core_web_sm")
+
+# -------------------------------
+# Technical & Soft Skill Lists
+# -------------------------------
+technical_skills = ["Python", "SQL", "NLP", "Machine Learning", "Data Analysis"]
+soft_skills = ["communication", "teamwork", "leadership", "problem solving", "time management"]
+
+# -------------------------------
+# PhraseMatcher for Technical Skills (Case-insensitive)
+# -------------------------------
+tech_matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
+tech_patterns = [nlp.make_doc(skill) for skill in technical_skills]
+tech_matcher.add("TECH_SKILLS", tech_patterns)
+
+# -------------------------------
+# Function to extract technical skills
+# -------------------------------
+def extract_technical_skills(text):
+    doc = nlp(text)
+    matches = tech_matcher(doc)
+    skills = {doc[start:end].text.lower() for _, start, end in matches}
+    return list(skills)
+
+# -------------------------------
+# Function to extract soft skills (token comparison)
+# -------------------------------
+def extract_soft_skills(text):
+    doc = nlp(text.lower())
+    tokens = {token.text for token in doc}
+    skills = set()
+    for skill in soft_skills:
+        if skill in tokens or skill.replace(" ", "") in text.replace(" ", "").lower():
+            skills.add(skill)
+    return list(skills)
+
+# -------------------------------
+# Test Inputs
+# -------------------------------
+text1 = "I have experience in Python and SQL."
+text2 = "Experience in Python, NLP, and Machine Learning with SQL."
+text3 = """
+I have strong communication skills, teamwork abilities, and leadership qualities.
+I also know Python; SQL, Python, and Machine Learning.
+"""
+
+resume_text = "Skilled in Python, SQL and good communication and teamwork."
+job_description = "Looking for Python, NLP, SQL and leadership skills."
+
+# -------------------------------
+# Skill Extraction
+# -------------------------------
+tech1 = extract_technical_skills(text1)
+tech2 = extract_technical_skills(text2)
+tech3 = extract_technical_skills(text3)
+
+soft3 = extract_soft_skills(text3)
+
+resume_skills = {
+    "technical_skills": extract_technical_skills(resume_text),
+    "soft_skills": extract_soft_skills(resume_text)
+}
+
+job_skills = {
+    "technical_skills": extract_technical_skills(job_description),
+    "soft_skills": extract_soft_skills(job_description)
+}
+
+# -------------------------------
+# Final Normalized Output
+# -------------------------------
+final_output = {
+    "technical_skills": list(set(tech1 + tech2 + tech3)),
+    "soft_skills": list(set(soft3))
+}
+
+# -------------------------------
+# Print Outputs
+# -------------------------------
+print("Extracted Skills from text1:", tech1)
+print("Extracted Skills from text2:", tech2)
+print("Extracted Skills from text3:", tech3)
+print("Extracted Soft Skills:", soft3)
+
+print("\nFinal Combined Output:")
+print(json.dumps(final_output, indent=4))
+
+print("\nResume Skills JSON:")
+print(json.dumps(resume_skills, indent=4))
+
+print("\nJob Description Skills JSON:")
+print(json.dumps(job_skills, indent=4))
+
+
+
+OUTPUT:
+
+Extracted Skills from text1: ['python', 'sql']
+Extracted Skills from text2: ['python', 'nlp', 'machine learning', 'sql']
+Extracted Skills from text3: ['python', 'machine learning', 'sql']
+Extracted Soft Skills: ['communication', 'teamwork', 'leadership']
+
+Final Combined Output:
+{
+    "technical_skills": [
+        "python",
+        "sql",
+        "nlp",
+        "machine learning"
+    ],
+    "soft_skills": [
+        "communication",
+        "teamwork",
+        "leadership"
+    ]
+}
+
+Resume Skills JSON:
+{
+    "technical_skills": [
+        "python",
+        "sql"
+    ],
+    "soft_skills": [
+        "communication",
+        "teamwork"
+    ]
+}
+
+Job Description Skills JSON:
+{
+    "technical_skills": [
+        "python",
+        "sql",
+        "nlp"
+    ],
+    "soft_skills": [
+        "leadership"
+    ]
+}
