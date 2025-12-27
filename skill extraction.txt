@@ -1,0 +1,156 @@
+import csv
+from collections import Counter
+
+# -----------------------------
+# Sample Resume & Job Description
+# -----------------------------
+resume_text = "Experienced in Python and SQL. Skilled in data analysis, communication and teamwork."
+job_description = "Looking for a candidate with Python, SQL, problem solving and communication skills."
+
+# -----------------------------
+# 1. Technical skills list
+# -----------------------------
+technical_skills = ["Python", "SQL", "Machine Learning", "Data Analysis", "Cloud Computing"]
+print("1. Technical Skills:", technical_skills)
+
+# -----------------------------
+# 2. Soft skills list
+# -----------------------------
+soft_skills = ["Communication", "Teamwork", "Problem Solving", "Time Management", "Leadership"]
+print("2. Soft Skills:", soft_skills)
+
+# -----------------------------
+# 3. Convert resume text to lowercase
+# -----------------------------
+lower_text = "Experienced in Python and SQL.".lower()
+print("3. Lowercase Resume Text:", lower_text)
+
+# -----------------------------
+# 4. Check if 'python' exists in resume
+# -----------------------------
+print("4. 'python' exists in resume:", "python" in resume_text.lower())
+
+# -----------------------------
+# 5. Print skills using loop
+# -----------------------------
+print("5. Technical Skills using loop:")
+for skill in technical_skills:
+    print("-", skill)
+
+print("Soft Skills using loop:")
+for skill in soft_skills:
+    print("-", skill)
+
+# -----------------------------
+# 6. Extract technical skills from resume
+# -----------------------------
+resume_lower = resume_text.lower()
+extracted_tech = [skill for skill in technical_skills if skill.lower() in resume_lower]
+print("6. Extracted Technical Skills:", extracted_tech)
+
+# -----------------------------
+# 7. Extract soft skills from job description
+# -----------------------------
+job_lower = job_description.lower()
+extracted_soft = [skill for skill in soft_skills if skill.lower() in job_lower]
+print("7. Extracted Soft Skills:", extracted_soft)
+
+# -----------------------------
+# 8. Read skills from CSV & print technical skills
+# -----------------------------
+with open("skills.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Skill", "Category"])
+    writer.writerow(["Python", "Technical"])
+    writer.writerow(["SQL", "Technical"])
+    writer.writerow(["Communication", "Soft"])
+
+print("8. Technical Skills from CSV:")
+with open("skills.csv", "r") as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+        if row["Category"] == "Technical":
+            print("-", row["Skill"])
+
+# -----------------------------
+# 9. Find common skills
+# -----------------------------
+common_skills = set(extracted_tech) & set(technical_skills)
+print("9. Common Skills:", common_skills)
+
+# -----------------------------
+# 10. Store skills without duplicates
+# -----------------------------
+unique_skills = list(set(extracted_tech + extracted_soft))
+print("10. Unique Extracted Skills:", unique_skills)
+
+# -----------------------------
+# 11. Store skills in dictionary
+# -----------------------------
+skills_dict = {
+    "Technical": extracted_tech,
+    "Soft": extracted_soft
+}
+print("11. Skills Dictionary:", skills_dict)
+
+# -----------------------------
+# 12. Identify missing skills
+# -----------------------------
+missing_skills = set(technical_skills) - set(extracted_tech)
+print("12. Missing Technical Skills:", missing_skills)
+
+# -----------------------------
+# 13. Count skill frequency in resume
+# -----------------------------
+skill_count = Counter(resume_lower.split())
+print("13. Skill Frequency:", skill_count)
+
+# -----------------------------
+# 14. Case-insensitive skill matching
+# -----------------------------
+matched_skills = [skill for skill in technical_skills if skill.lower() in resume_lower]
+print("14. Case-insensitive Matched Skills:", matched_skills)
+
+# -----------------------------
+# 15. Save extracted skills to new CSV
+# -----------------------------
+with open("extracted_skills.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Skill"])
+    for skill in unique_skills:
+        writer.writerow([skill])
+
+print("15. Extracted skills saved to extracted_skills.csv")
+
+
+
+
+output:
+1. Technical Skills: ['Python', 'SQL', 'Machine Learning', 'Data Analysis', 'Cloud Computing']
+2. Soft Skills: ['Communication', 'Teamwork', 'Problem Solving', 'Time Management', 'Leadership']
+3. Lowercase Resume Text: experienced in python and sql.
+4. 'python' exists in resume: True
+5. Technical Skills using loop:
+- Python
+- SQL
+- Machine Learning
+- Data Analysis
+- Cloud Computing
+Soft Skills using loop:
+- Communication
+- Teamwork
+- Problem Solving
+- Time Management
+- Leadership
+6. Extracted Technical Skills: ['Python', 'SQL', 'Data Analysis']
+7. Extracted Soft Skills: ['Communication', 'Problem Solving']
+8. Technical Skills from CSV:
+- Python
+- SQL
+9. Common Skills: {'Python', 'SQL', 'Data Analysis'}
+10. Unique Extracted Skills: ['Python', 'SQL', 'Communication', 'Problem Solving', 'Data Analysis']
+11. Skills Dictionary: {'Technical': ['Python', 'SQL', 'Data Analysis'], 'Soft': ['Communication', 'Problem Solving']}
+12. Missing Technical Skills: {'Cloud Computing', 'Machine Learning'}
+13. Skill Frequency: Counter({'experienced': 1, 'in': 1, 'python': 1, 'and': 1, 'sql.': 1, 'skilled': 1, 'data': 1, 'analysis,': 1, 'communication': 1, 'teamwork.': 1})
+14. Case-insensitive Matched Skills: ['Python', 'SQL', 'Data Analysis']
+15. Extracted skills saved to extracted_skills.csv
