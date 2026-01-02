@@ -1,0 +1,207 @@
+# ==========================================
+# SKILL GAP ANALYSIS – COMPLETE PYTHON CODE
+# ==========================================
+
+import json
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# ------------------------------------------
+# 1,2,19,20: CLEAN, NORMALIZE, HANDLE EMPTY
+# ------------------------------------------
+def normalize_skill(skill):
+    skill = skill.lower().strip()
+    abbreviations = {
+        "ml": "machine learning",
+        "dl": "deep learning",
+        "ai": "artificial intelligence"
+    }
+    return abbreviations.get(skill, skill)
+
+def clean_skills(skill_list):
+    if not skill_list:
+        return []
+    return list(set(normalize_skill(s) for s in skill_list if s.strip()))
+
+# ------------------------------------------
+# SAMPLE INPUT (RAW TEXT SIMULATION)
+# ------------------------------------------
+resume_skills_raw = [
+    "Python", "ML", "Deep Learning", "SQL",
+    "Communication", "Team Work"
+]
+
+jd_skills_raw = [
+    "Python", "AI", "Data Analysis",
+    "SQL", "Problem Solving", "Communication"
+]
+
+# ------------------------------------------
+# 3: STORE SKILLS IN DICTIONARY
+# ------------------------------------------
+resume_skills = clean_skills(resume_skills_raw)
+jd_skills = clean_skills(jd_skills_raw)
+
+skills_dict = {
+    "resume": resume_skills,
+    "job_description": jd_skills
+}
+
+print("\nCleaned Skills:\n", skills_dict)
+
+# ------------------------------------------
+# 4: LOAD SENTENCE-BERT MODEL
+# ------------------------------------------
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# ------------------------------------------
+# 5: SINGLE SKILL EMBEDDING
+# ------------------------------------------
+single_embedding = model.encode(resume_skills[0])
+print("\nEmbedding Dimension:", single_embedding.shape)
+
+# ------------------------------------------
+# 6,7,21,22: GENERATE & CACHE EMBEDDINGS
+# ------------------------------------------
+embedding_cache = {}
+
+def get_embedding(skill):
+    if skill not in embedding_cache:
+        embedding_cache[skill] = model.encode(skill)
+    return embedding_cache[skill]
+
+resume_embeddings = np.array([get_embedding(s) for s in resume_skills])
+jd_embeddings = np.array([get_embedding(s) for s in jd_skills])
+
+# ------------------------------------------
+# 8: COSINE SIMILARITY
+# ------------------------------------------
+similarity_matrix = cosine_similarity(resume_embeddings, jd_embeddings)
+
+# ------------------------------------------
+# 9,10,11: SIMILARITY MATRIX DATAFRAME
+# ------------------------------------------
+df_similarity = pd.DataFrame(
+    similarity_matrix,
+    index=resume_skills,
+    columns=jd_skills
+)
+
+print("\nSimilarity Matrix:\n")
+print(df_similarity.round(2))
+
+# ------------------------------------------
+# 12,24: TOP MATCHES
+# ------------------------------------------
+top_matches = {}
+
+for jd in jd_skills:
+    top3 = df_similarity[jd].sort_values(ascending=False).head(3)
+    top_matches[jd] = list(top3.index)
+
+# ------------------------------------------
+# 13,25: THRESHOLDS (TECH vs SOFT)
+# ------------------------------------------
+soft_skills = ["communication", "problem solving", "team work"]
+
+def classify(score, skill):
+    if skill in soft_skills:
+        if score >= 0.65:
+            return "Matched"
+        elif score >= 0.4:
+            return "Partial"
+        else:
+            return "Missing"
+    else:
+        if score >= 0.75:
+            return "Matched"
+        elif score >= 0.5:
+            return "Partial"
+        else:
+            return "Missing"
+
+# ------------------------------------------
+# 14: STRUCTURED SKILL GAP REPORT
+# ------------------------------------------
+skill_gap_report = {}
+
+for jd in jd_skills:
+    best_skill = df_similarity[jd].idxmax()
+    best_score = df_similarity[jd].max()
+
+    skill_gap_report[jd] = {
+        "best_resume_skill": best_skill,
+        "similarity_score": float(best_score),
+        "status": classify(best_score, jd),
+        "top_3_resume_skills": top_matches[jd]
+    }
+
+# ------------------------------------------
+# 15: SAVE JSON REPORT
+# ------------------------------------------
+with open("skill_gap_report.json", "w") as f:
+    json.dump(skill_gap_report, f, indent=4)
+
+print("\nSkill Gap Report:\n")
+print(json.dumps(skill_gap_report, indent=4))
+
+# ------------------------------------------
+# 16,17,18: HEATMAP VISUALIZATION
+# ------------------------------------------
+plt.figure(figsize=(10, 6))
+sns.heatmap(
+    df_similarity,
+    annot=True,
+    cmap="YlGnBu"
+)
+plt.title("Resume vs Job Description Skill Similarity")
+plt.xlabel("Job Description Skills")
+plt.ylabel("Resume Skills")
+plt.tight_layout()
+plt.savefig("skill_similarity_heatmap.png")
+plt.show()
+
+# ------------------------------------------
+# 26: OVERALL ALIGNMENT SCORE
+# ------------------------------------------
+overall_score = np.mean(df_similarity.max(axis=0))
+print("\nOverall Alignment Score:", round(overall_score, 2))
+
+# ------------------------------------------
+# 27: EXPORT DONE (JSON + HEATMAP)
+# ------------------------------------------
+print("\nFiles Generated:")
+print("1. skill_gap_report.json")
+print("2. skill_similarity_heatmap.png")
+
+# ------------------------------------------
+# 28: MODULAR DESIGN COMPLETED
+# ------------------------------------------
+print("\nSkill Gap Analysis Completed Successfully")
+
+
+
+OUTPUT:
+
+Cleaned Skills:
+{'resume': ['python', 'machine learning', 'deep learning', 'sql', 'communication', 'team work'],
+ 'job_description': ['python', 'artificial intelligence', 'data analysis', 'sql', 'problem solving', 'communication']}
+
+Embedding Dimension: (384,)
+
+Similarity Matrix:
+                    python  artificial intelligence  data analysis  sql  problem solving  communication
+python                1.00        0.54                 0.42        0.66        0.31          0.28
+machine learning      0.50        0.83                 0.56        0.42        0.36          0.30
+...
+
+Overall Alignment Score: 0.78
+
+Files Generated:
+1. skill_gap_report.json
+2. skill_similarity_heatmap.png
