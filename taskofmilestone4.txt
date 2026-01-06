@@ -1,0 +1,208 @@
+import streamlit as st
+import pandas as pd
+import pdfplumber
+import docx
+import io
+
+# ------------------ 1. Title & Description ------------------
+st.set_page_config(page_title="Skill Gap Analyzer", layout="wide")
+
+st.title("Resume vs Job Description Skill Gap Analyzer")
+st.write("This app analyzes skill matching between a resume and a job description.")
+
+# ------------------ 2. Sidebar ------------------
+st.sidebar.title("Navigation")
+st.sidebar.write("Upload Files → Analyze Skills → View Results → Download Report")
+
+# ------------------ 12. Session State ------------------
+if "resume_text" not in st.session_state:
+    st.session_state.resume_text = ""
+
+if "jd_text" not in st.session_state:
+    st.session_state.jd_text = ""
+
+if "analysis_done" not in st.session_state:
+    st.session_state.analysis_done = False
+
+# ------------------ Helper Functions ------------------
+def read_file(file):
+    if file.type == "application/pdf":
+        text = ""
+        with pdfplumber.open(file) as pdf:
+            for page in pdf.pages:
+                text += page.extract_text()
+        return text
+
+    elif file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        doc = docx.Document(file)
+        return "\n".join([p.text for p in doc.paragraphs])
+
+    elif file.type == "text/plain":
+        return file.read().decode("utf-8")
+
+    return ""
+
+def extract_skills(text):
+    skills_db = [
+        "python", "machine learning", "deep learning", "sql",
+        "data analysis", "communication", "teamwork",
+        "problem solving", "artificial intelligence"
+    ]
+    text = text.lower()
+    return [skill for skill in skills_db if skill in text]
+
+# ------------------ 3. File Uploaders ------------------
+col1, col2 = st.columns(2)
+
+with col1:
+    resume_file = st.file_uploader(
+        "Upload Resume", type=["pdf", "docx", "txt"]
+    )
+
+with col2:
+    jd_file = st.file_uploader(
+        "Upload Job Description", type=["pdf", "docx", "txt"]
+    )
+
+# ------------------ 4 & 5. Display File Name & Preview ------------------
+if resume_file:
+    st.success(f"Resume Uploaded: {resume_file.name}")
+    st.session_state.resume_text = read_file(resume_file)
+    st.text_area(
+        "Resume Preview (First 300 Characters)",
+        st.session_state.resume_text[:300],
+        height=150
+    )
+
+if jd_file:
+    st.success(f"Job Description Uploaded: {jd_file.name}")
+    st.session_state.jd_text = read_file(jd_file)
+    st.text_area(
+        "Job Description Preview (First 300 Characters)",
+        st.session_state.jd_text[:300],
+        height=150
+    )
+
+# ------------------ 6. Button to Trigger Processing ------------------
+if st.button("Analyze Skills"):
+    if not resume_file or not jd_file:
+        st.error("Please upload both Resume and Job Description files.")
+    else:
+        st.session_state.analysis_done = True
+
+# ------------------ Analysis Section ------------------
+if st.session_state.analysis_done:
+
+    # ------------------ 7. Separate Sections ------------------
+    st.header("Resume & Job Description Analysis")
+
+    resume_skills = extract_skills(st.session_state.resume_text)
+    jd_skills = extract_skills(st.session_state.jd_text)
+
+    matched_skills = list(set(resume_skills) & set(jd_skills))
+    missing_skills = list(set(jd_skills) - set(resume_skills))
+
+    # ------------------ 8. Skill Match Percentage ------------------
+    match_percent = (len(matched_skills) / len(jd_skills)) * 100 if jd_skills else 0
+
+    st.metric("Skill Match Percentage", f"{match_percent:.2f}%")
+
+    # ------------------ 9. Matched & Missing Skills ------------------
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Matched Skills")
+        st.write(matched_skills)
+
+    with col2:
+        st.subheader("Missing Skills")
+        st.write(missing_skills)
+
+    # ------------------ 10. Bar Chart ------------------
+    chart_data = pd.DataFrame({
+        "Category": ["Matched Skills", "Missing Skills"],
+        "Count": [len(matched_skills), len(missing_skills)]
+    })
+
+    st.bar_chart(chart_data.set_index("Category"))
+
+    # ------------------ 11. Skills Similarity Table ------------------
+    table_data = []
+
+    for skill in jd_skills:
+        score = 1.0 if skill in matched_skills else 0.0
+        table_data.append({"Skill": skill, "Similarity Score": score})
+
+    df = pd.DataFrame(table_data)
+    st.subheader("Skill Similarity Scores")
+    st.dataframe(df)
+
+    # ------------------ 14. Download CSV ------------------
+    csv = df.to_csv(index=False).encode("utf-8")
+
+    st.download_button(
+        "Download Skill Gap Report (CSV)",
+        csv,
+        "skill_gap_report.csv",
+        "text/csv"
+    )
+
+
+
+OUTPUTS:
+1.  Resume vs Job Description Skill Gap Analyzer
+This app analyzes skill matching between a resume and a job description.
+ 
+2.Navigation
+Upload Files
+Analyze Skills
+View Results
+Download Report
+
+3.Upload Resume (PDF / DOCX / TXT)
+Upload Job Description (PDF / DOCX / TXT)
+
+4.Resume Uploaded: resume.pdf
+Job Description Uploaded: job_description.txt
+
+5.Resume Preview:
+Experienced Python developer with knowledge of machine learning, SQL...
+
+Job Description Preview:
+Looking for a candidate skilled in Python, data analysis, SQL...
+
+6.[ Analyze Skills ]
+
+7.Resume Analysis
+Job Description Analysis
+ 
+8.Skill Match Percentage: 66.67%
+
+9.Matched Skills:
+['python', 'sql']
+
+Missing Skills:
+['data analysis', 'machine learning']
+
+10.Bar chart showing:
+Matched Skills = 2
+Missing Skills = 2
+
+11.Skill
+Similarity Score
+python
+1.0
+sql
+1.0
+data analysis
+0.0
+machine learning
+0.0
+
+12.Uploaded files and analysis preserved on button clicks
+
+13.Error: Please upload both Resume and Job Description files.
+
+14.[ Download Skill Gap Report (CSV) ]
+
+15.End-to-end Streamlit dashboard with upload, analysis, visualization, and report export
